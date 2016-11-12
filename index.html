@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Databases homework</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+<body>
+    <nav class="navbar navbar-default">
+      <div class="container">
+        <div class="navbar-header">
+          <h3>Users list</h3>
+          <button id="get_list_button">Get Users</button>
+          <a id="get_users_button" href="users.html" target="_blank">Show users</a>
+        </div>
+      </div>
+    </nav>
+    
+    <div class="container">
+    <div id="User_list"></div><br>
+    <button id="remove_all_button">Remove All</button>
+    <h4>Add User</h4>
+    <input type="text" name="New To DO" id="add_User">
+    <button id="add_User_button">Add</button>
+    <div id="errormsg" style="color:red;font-weight:bold;"></div>
+  </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#get_list_button").click(function(){
+                console.log("get list clicked");
+                $.ajax({
+                    url: "http://localhost:8080/User",
+                    method: "GET",
+                    success: showUsers,
+              error:showError,
+                })
+            });
+        
+            $("#remove_all_button").click(function(){
+                console.log("remove all clicked");
+                $.ajax({
+                    url: "http://localhost:8080/User",
+                    method: "DELETE",
+                    success: showUsers,
+              error:showError,
+                })
+            });
+            $("#deleteUserItem").click(function(){
+                console.log("delete User item clicked");
+                $.ajax({
+                    url: "http://localhost:8080/User",
+                    method: "DELETE",
+                    success: showUsers,
+              error:showError,
+                })
+            });
+            $("#add_User_button").click(function(){
+                console.log("add User clicked")
+                console.log("add this User: " + $("#add_User").val())
+                $.ajax({
+                    url: "http://localhost:8080/User",
+                    method: "POST",
+              contentType: 'application/json; charset=utf-8',
+              dataType: 'json',
+                    data: JSON.stringify({
+                "text": $("#add_User").val(),
+              }),
+                    success: showUsers,
+              error:showError,
+                })
+            });
+      function showError(resp, status) {
+        if (resp.responseJSON && resp.responseJSON.error) {
+          $("#errormsg").text(resp.responseJSON.error)
+        } else {
+          $("#errormsg").text(resp.responseText)
+        }
+      }
+            function showUsers(data, status) {
+                $("#User_list").empty();
+                if ($.isEmptyObject(data)) {
+                    $("#User_list").append("<h4>You have nothing to do!</h4>");
+                } else {
+                    $.each(data, function (i, UserObject) {
+            $("#User_list").append(
+              $('<div>')
+                .append($('<span>').css({display:'inline-block', width: '50px'}).text(data[i].Id))
+                .append($('<span>').css({display:'inline-block', width: '300px'}).text(data[i].Name))
+                .append($('<span>').css({display:'inline-block', width: '50px'}).text(data[i].Done))
+
+                .append($('<button>').text('Remove Item').click(function(){
+                            $.ajax({
+                                url: "http://localhost:8080/User/" + data[i].Id,
+                                method: "DELETE",
+                                success: showUsers
+                            })
+                    })
+              )
+            )
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
