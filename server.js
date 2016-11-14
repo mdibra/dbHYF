@@ -120,5 +120,5 @@ function sendError (response, code, message) {
 }
 
 // Start the server.
-app.listen(8080)
-console.log('Listening to port 8080')
+app.listen(3000)
+console.log('Listening to port 3000')
